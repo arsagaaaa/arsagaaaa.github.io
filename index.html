@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revolusi Kecerdasan Buatan - Portal Berita</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        /* Header */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1a2a6c;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .logo:hover {
+            color: #b21f1f;
+        }
+        
+        .back-btn {
+            background-color: #1a2a6c;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: #0d1940;
+        }
+        
+        /* Article Container */
+        .article-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        /* Article Header */
+        .article-header {
+            margin-bottom: 30px;
+        }
+        
+        .article-category {
+            display: inline-block;
+            background-color: #1a2a6c;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        
+        .article-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.95rem;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        .author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .author-name {
+            font-weight: bold;
+            color: #1a2a6c;
+        }
+        
+        .article-date {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .reading-time {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Featured Image */
+        .featured-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: -20px;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        /* Article Content */
+        .article-content {
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .article-content p {
+            margin-bottom: 25px;
+            text-align: justify;
+        }
+        
+        .article-content h2 {
+            font-size: 1.8rem;
+            margin: 35px 0 20px;
+            color: #1a2a6c;
+            line-height: 1.3;
+        }
+        
+        .article-content h3 {
+            font-size: 1.4rem;
+            margin: 30px 0 15px;
+            color: #333;
+        }
+        
+        .article-content blockquote {
+            background-color: #f8f9fa;
+            border-left: 4px solid #1a2a6c;
+            padding: 20px 30px;
+            margin: 30px 0;
+            font-style: italic;
+            color: #555;
+            font-size: 1.2rem;
+        }
+        
+        /* Share Section */
+        .share-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+        
+        .share-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #666;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .share-facebook { background-color: #3b5998; }
+        .share-twitter { background-color: #1da1f2; }
+        .share-whatsapp { background-color: #25d366; }
+        .share-linkedin { background-color: #0077b5; }
+        
+        /* Footer */
+        footer {
+            background-color: #1a2a6c;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+        }
+        
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        
+        .footer-links a:hover {
+            opacity: 0.8;
+        }
+        
+        .copyright {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .article-container {
+                margin: 20px;
+                padding: 25px;
+            }
+            
+            .article-title {
+                font-size: 2rem;
+            }
+            
+            .featured-image {
+                height: 250px;
+            }
+            
+            .article-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">Berita Kita-Kita Aja</a>
+            
+        </div>
+    </header>
+    
+    <!-- Article Container -->
+    <main class="article-container">
+        <!-- Article Header -->
+        <header class="article-header">
+            <span class="article-category">Teknologi crypto </span>
+            <h1 class="article-title">HUBUNGAN TINGKAT KEPUASAN TERHADAP SISTEM TRANSAKSI YANG DIGUNAKAN OLEH APLIKASI ONLINE INDODAX</h1>
+            <div class="article-meta">
+                </div>
+                <div class="article-date">
+                    <span>📅</span>
+                    <span>20 agustus 2025</span>
+                </div>
+                <div class="reading-time">
+                    <span>⏱️</span>
+                    <span>8 menit baca</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Featured Image -->
+        <img src="indodax.jpeg" alt="aplikasi crypto" class="featured-image">
+        <p class="image-caption">logo aplikasi indodax</p>
+        
+        <!-- Article Content -->
+        <article class="article-content">
+            <p>Indodax adalah platform pertukaran aset kripto terbesar di Indonesia yang didirikan pada tahun 2014. Aplikasi ini memungkinkan pengguna untuk membeli, menjual, dan menyimpan berbagai aset digital, termasuk Bitcoin dan Ethereum, menggunakan mata uang rupiah. Dalam industri aset kripto yang bergerak cepat dan sangat volatil, kecepatan transaksi menjadi faktor penting yang dapat memengaruhi pengalaman dan kepuasan pengguna.</p>
+            
+            <p>Indodax beroperasi di bawah pengawasan BAPPEBTI, yang memberikan legalitas dan keamanan bagi penggunanya. Layanan yang ditawarkan Indodax mencakup trading spot antara aset kripto dan rupiah, dompet digital untuk penyimpanan aset, serta fitur keamanan seperti autentikasi dua faktor (2FA) dan verifikasi KYC (Know Your Customer).</p>
+            
+            <p>Penelitian ini melibatkan 62 responden pengguna aplikasi Indodax. Analisis data terbagi menjadi univariat dan bivariat.</p>
+
+            <p>Mayoritas responden dalam penelitian ini berusia 20-30 tahun (66,1%) dan berjenis kelamin laki-laki (54,8%). Tingkat pendidikan terbanyak adalah SMA/MA (48,4%). Sebagian besar responden telah menggunakan Indodax selama 1-2 tahun (40,3%) dengan frekuensi transaksi 2-3 kali dalam sebulan terakhir (45,2%). Mayoritas responden (79,0%) menilai kecepatan transaksi pada aplikasi ini "cepat"</p>
+            <img src="2.png" alt="aplikasi crypto" class="featured-image">
+            <h2>Tingkat Kepuasan Pengguna</h2>
+            
+            <p>Berdasarkan hasil penelitian, mayoritas responden menyatakan puas (72,6%), sementara 27,4% menyatakan tidak puas. Hal ini menunjukkan bahwa sebagian besar pengguna merasa sistem transaksi Indodax cukup cepat dan memuaskan</p>
+            <img src="anjay.png">
+            <blockquote>service quality oleh Parasuraman, Zeithaml, dan Berry (1988) juga mendukung temuan ini, di mana kecepatan layanan (responsiveness) adalah indikator penting kepuasan.</blockquote>
+            
+            <p>Hasil uji statistik Chi-Square menunjukkan nilai p-value = 0,032. Karena nilai ini lebih kecil dari nilai α = 0,05, dapat disimpulkan bahwa terdapat hubungan signifikan antara tingkat kepuasan dan kecepatan sistem transaksi pada aplikasi Indodax.</p>
+            
+            <h2>Menurut Peneliti</h2>
+            
+            <p>Dengan demikian, hasil penelitian ini memiliki landasan teoritis yang kuat dan dukungan empiris yang konsisten dari penelitian dalam negeri maupun luar negeri. Secara keseluruhan, kecepatan sistem transaksi terbukti menjadi faktor penting dalam membentuk kepuasan pengguna, dan peningkatan pada aspek ini akan memberikan dampak positif terhadap pengalaman, loyalitas, serta kepercayaan pengguna pada Indodax. </p>
+            
+            <p>Menurut asumsi peneliti, kecepatan sistem transaksi pada aplikasi online Indodax merupakan faktor penting yang dapat meningkatkan tingkat kepuasan pengguna. Hal ini dikarenakan pada platform perdagangan aset kripto, setiap keterlambatan dalam pemrosesan transaksi dapat menimbulkan rasa tidak nyaman, kekhawatiran, bahkan kerugian finansial akibat volatilitas harga pasar. Kecepatan transaksi yang baik akan memberikan rasa aman, percaya diri, dan kenyamanan bagi pengguna dalam melakukan aktivitas jual-beli aset digital. Dengan sistem yang responsif, pengguna merasa lebih dihargai dan termotivasi untuk terus menggunakan platform Indodax. </p>
+            
+            <h2>Masa Depan Bersama AI</h2>
+            
+            <p>Di tengah dinamika pasar kripto, Indodax hadir sebagai jembatan yang menghubungkan Anda dengan masa depan keuangan digital. Bersama Indodax, Anda tidak hanya bertransaksi, tetapi juga membangun portofolio aset masa depan yang terpercaya.</p>
+            
+            <h2>Saran bagi peneliti</h2>
+            <p>Bagi peneliti yang akan melakukan penelitian sejenis, disarankan untuk memperluas lingkup penelitian dengan menambahkan variabel lain, seperti keamanan sistem, kemudahan penggunaan aplikasi, serta kualitas layanan pelanggan. Hal ini bertujuan agar penelitian berikutnya dapat memberikan gambaran yang lebih komprehensif mengenai faktor-faktor yang memengaruhi kepuasan pengguna. Selain itu, penelitian juga dapat dilakukan pada platform perdagangan aset kripto lainnya untuk memperoleh perbandingan yang lebih luas, sehingga dapat diketahui strategi yang paling efektif dalam meningkatkan kepuasan pengguna di berbagai platform perdagangan aset digital.</p>
+        </article>
+        
+        <!-- Share Section -->
+        <div class="share-section">
+            <h3 class="share-title">Bagikan artikel ini:</h3>
+            <div class="share-buttons">
+                <a href="#" class="share-btn share-facebook" title="Bagikan ke Facebook">f</a>
+                <a href="#" class="share-btn share-twitter" title="Bagikan ke Twitter">t</a>
+                <a href="#" class="share-btn share-whatsapp" title="Bagikan ke WhatsApp">w</a>
+                <a href="#" class="share-btn share-linkedin" title="Bagikan ke LinkedIn">in</a>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+            </div>
+            <p class="copyright">&copy; 2025 Portal Berita. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Share button functionality
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent(document.querySelector('.article-title').textContent);
+                
+                let shareUrl = '';
+                if(this.classList.contains('share-facebook')) {
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                } else if(this.classList.contains('share-twitter')) {
+                    shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+                } else if(this.classList.contains('share-whatsapp')) {
+                    shareUrl = `https://wa.me/?text=${title}%20${url}`;
+                } else if(this.classList.contains('share-linkedin')) {
+                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+                }
+                
+                if(shareUrl) {
+                    window.open(shareUrl, '_blank', 'width=600,height=400');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
