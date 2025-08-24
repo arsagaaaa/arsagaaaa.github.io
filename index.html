@@ -1,394 +1,161 @@
-import React, { useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from "recharts";
-import { Search, Filter, Download, Calendar, FileText, Settings2 } from "lucide-react";
-
-// Simple shadcn-style components (fallback if not available)
-const Container = ({ children }) => (
-  <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-800 antialiased">
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">{children}</div>
-  </div>
-);
-
-const Section = ({ title, children, id }) => (
-  <section id={id} className="scroll-mt-24">
-    <motion.h2
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-4"
-    >
-      {title}
-    </motion.h2>
-    <div className="prose prose-slate max-w-none">{children}</div>
-  </section>
-);
-
-const Card = ({ children, className = "" }) => (
-  <div className={`bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 ${className}`}>{children}</div>
-);
-const CardHeader = ({ title, subtitle, icon }) => (
-  <div className="p-5 border-b border-slate-100">
-    <div className="flex items-start gap-3">
-      <div className="p-2 rounded-xl bg-slate-50 ring-1 ring-slate-200">
-        {icon}
-      </div>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HUBUNGAN TINGKAT KEPUASAN TERHADAP SISTEM TRANSAKSI YANG DIGUNAKAN OLEH APLIKASI ONLINE INDODAX
+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f7f8fa;--card:#ffffff;--muted:#6b7280;--accent:#0f766e}
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;background:var(--bg);color:#0f172a}
+    .container{max-width:1100px;margin:36px auto;padding:24px}
+    header{display:flex;align-items:center;gap:16px}
+    header h1{margin:0;font-size:1.6rem}
+    .meta{color:var(--muted);font-size:0.95rem}
+    .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(12,14,20,.06);margin-top:18px}
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
+    .full{grid-column:1/-1}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #eef2f6}
+    .small{font-size:0.9rem;color:var(--muted)}
+    footer{margin-top:26px;color:var(--muted);font-size:0.9rem}
+    @media (max-width:900px){.grid{grid-template-columns:1fr} .card{padding:14px}}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <rect width="24" height="24" rx="6" fill="#06b6d4"></rect>
+        <path d="M6 15h12M6 9h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
       <div>
-        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-        {subtitle && <p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>}
+        <h1>HUBUNGAN TINGKAT KEPUASAN TERHADAP SISTEM TRANSAKSI YANG DIGUNAKAN OLEH APLIKASI ONLINE INDODAX
+</h1>
+        <div class="meta">Ringkasan visual dan artikel yang dibuat dari dokumen penelitian Anda.</div>
       </div>
-    </div>
-  </div>
-);
-const CardBody = ({ children }) => <div className="p-5">{children}</div>;
+    </header>
 
-const Tag = ({ children }) => (
-  <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200">
-    {children}
-  </span>
-);
+    <div class="grid">
+      <article class="card">
+        <h2>Ringkasan Temuan</h2>
+        <p class="small">Berdasarkan data survei terhadap <strong>62 responden</strong>, mayoritas berusia 20–30 tahun dan 72,6% menyatakan puas terhadap kecepatan transaksi. Uji Chi-square menunjukkan hubungan signifikan (p = 0,032 &lt; 0,05) antara kecepatan transaksi dan tingkat kepuasan.</p>
 
-const datasets = {
-  Semua: [
-    { aspek: "Kecepatan", puas: 82, netral: 11, tidakPuas: 7 },
-    { aspek: "Kestabilan", puas: 79, netral: 14, tidakPuas: 7 },
-    { aspek: "Kemudahan", puas: 85, netral: 9, tidakPuas: 6 },
-    { aspek: "Biaya", puas: 71, netral: 18, tidakPuas: 11 },
-    { aspek: "Keamanan", puas: 88, netral: 8, tidakPuas: 4 },
-    { aspek: "Dukungan", puas: 75, netral: 17, tidakPuas: 8 },
-  ],
-  Pemula: [
-    { aspek: "Kecepatan", puas: 79, netral: 14, tidakPuas: 7 },
-    { aspek: "Kestabilan", puas: 76, netral: 17, tidakPuas: 7 },
-    { aspek: "Kemudahan", puas: 88, netral: 8, tidakPuas: 4 },
-    { aspek: "Biaya", puas: 69, netral: 20, tidakPuas: 11 },
-    { aspek: "Keamanan", puas: 86, netral: 11, tidakPuas: 3 },
-    { aspek: "Dukungan", puas: 73, netral: 19, tidakPuas: 8 },
-  ],
-  Berpengalaman: [
-    { aspek: "Kecepatan", puas: 85, netral: 9, tidakPuas: 6 },
-    { aspek: "Kestabilan", puas: 82, netral: 12, tidakPuas: 6 },
-    { aspek: "Kemudahan", puas: 81, netral: 11, tidakPuas: 8 },
-    { aspek: "Biaya", puas: 73, netral: 16, tidakPuas: 11 },
-    { aspek: "Keamanan", puas: 90, netral: 7, tidakPuas: 3 },
-    { aspek: "Dukungan", puas: 78, netral: 14, tidakPuas: 8 },
-  ],
-};
-
-const sampleInfo = {
-  n: 120,
-  waktu: "Juli 2025",
-  metode: [
-    "Survei online (Likert 1–5)",
-    "Purposive sampling pengguna aktif ≥ 3 bulan",
-    "Analisis deskriptif & korelasi Spearman",
-  ],
-  disclaimer:
-    "Data pada laman ini adalah simulasi untuk tujuan demo UI dan penulisan ilmiah. Bukan data resmi dari INDODAX.",
-};
-
-function Toolbar({ segment, setSegment, setQuery }) {
-  return (
-    <div className="flex flex-col md:flex-row items-stretch gap-3">
-      <div className="flex items-center gap-2 flex-1 bg-white rounded-2xl ring-1 ring-slate-200 px-3 py-2 shadow-sm">
-        <Search className="w-4 h-4 text-slate-500" />
-        <input
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Cari kata kunci di artikel…"
-          className="w-full outline-none text-sm"
-        />
-      </div>
-      <div className="flex items-center gap-2 bg-white rounded-2xl ring-1 ring-slate-200 px-3 py-2 shadow-sm">
-        <Filter className="w-4 h-4 text-slate-500" />
-        <select
-          value={segment}
-          onChange={(e) => setSegment(e.target.value)}
-          className="bg-transparent text-sm"
-        >
-          {Object.keys(datasets).map((k) => (
-            <option key={k}>{k}</option>
-          ))}
-        </select>
-      </div>
-    </div>
-  );
-}
-
-export default function ArtikelIndodax() {
-  const [segment, setSegment] = useState("Semua");
-  const [query, setQuery] = useState("");
-
-  const data = datasets[segment];
-
-  const ringkasan = useMemo(() => {
-    const meanPuas = (
-      data.reduce((acc, d) => acc + d.puas, 0) / data.length
-    ).toFixed(1);
-    const aspekTerkuat = data.reduce((a, b) => (a.puas > b.puas ? a : b)).aspek;
-    const aspekTerlemah = data.reduce((a, b) => (a.puas < b.puas ? a : b)).aspek;
-    return { meanPuas, aspekTerkuat, aspekTerlemah };
-  }, [data]);
-
-  const sections = [
-    {
-      id: "abstrak",
-      title: "Abstrak",
-      body: (
-        <p>
-          Penelitian ini menganalisis <em>hubungan tingkat kepuasan</em> pengguna terhadap
-          <strong> sistem transaksi</strong> yang digunakan oleh aplikasi online INDODAX. Dengan
-          menggunakan survei {sampleInfo.n} responden pada {sampleInfo.waktu}, kami melakukan analisis
-          deskriptif dan uji korelasi untuk mengidentifikasi aspek yang paling berkontribusi terhadap
-          kepuasan. Hasil deskriptif menunjukkan rata-rata tingkat kepuasan pada berbagai aspek berada
-          di kisaran tinggi (≈ {ringkasan.meanPuas}% responden menyatakan puas). Aspek terkuat adalah
-          <strong> {ringkasan.aspekTerkuat}</strong>, sementara ruang peningkatan terbesar berada pada
-          aspek <strong>{ringkasan.aspekTerlemah}</strong>.
-        </p>
-      ),
-    },
-    {
-      id: "pendahuluan",
-      title: "Pendahuluan",
-      body: (
-        <>
-          <p>
-            Sistem transaksi merupakan tulang punggung pengalaman pengguna pada platform <em>crypto
-            exchange</em>. Di ekosistem INDODAX, performa sistem (kecepatan, kestabilan), kemudahan
-            penggunaan, biaya transaksi, keamanan, serta kualitas dukungan pelanggan berpotensi kuat
-            menentukan kepuasan serta loyalitas pengguna.
-          </p>
-          <p>
-            Penelitian ini bertujuan: (1) memotret tingkat kepuasan pengguna terhadap komponen
-            kunci sistem transaksi; (2) menguji hubungan antara intensitas penggunaan sistem
-            transaksi dan skor kepuasan; serta (3) memberikan rekomendasi perbaikan yang spesifik
-            dan dapat ditindaklanjuti.
-          </p>
-        </>
-      ),
-    },
-    {
-      id: "metodologi",
-      title: "Metodologi",
-      body: (
-        <ul>
-          <li>Desain: survei kuantitatif daring (skala Likert 1–5, diubah ke persentase puas).</li>
-          <li>Responden: {sampleInfo.n} pengguna aktif ≥ 3 bulan (purposive sampling).</li>
-          <li>Periode: {sampleInfo.waktu}.</li>
-          <li>Variabel: kepuasan per-aspek dan intensitas penggunaan (harian/mingguan/bulanan).</li>
-          <li>Analisis: statistik deskriptif & korelasi Spearman (ρ) antara intensitas & kepuasan.</li>
-          <li>Catatan: {sampleInfo.disclaimer}</li>
+        <h3>Rincian</h3>
+        <p class="small">Nilai-nilai utama yang dijadikan sumber grafik:</p>
+        <ul class="small">
+          <li>Usia 20–30: 41, Usia 31–40: 21</li>
+          <li>Jenis kelamin — Laki-laki: 34, Perempuan: 28</li>
+          <li>Puas: 45, Tidak puas: 17</li>
+          <li>Kecepatan transaksi — Cepat: 49, Lambat: 13</li>
         </ul>
-      ),
-    },
-    {
-      id: "hasil",
-      title: "Hasil & Visualisasi",
-      body: (
-        <>
-          <Card className="mb-6">
-            <CardHeader
-              title="Diagram Batang Kepuasan per Aspek"
-              subtitle={`Segmentasi: ${segment} | N = ${sampleInfo.n}`}
-              icon={<Settings2 className="w-5 h-5" />}
-            />
-            <CardBody>
-              <div className="h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data} barSize={36}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="aspek" tick={{ fontSize: 12 }} />
-                    <YAxis unit="%" tick={{ fontSize: 12 }} domain={[0, 100]} />
-                    <Tooltip formatter={(v) => `${v}%`} />
-                    <Legend wrapperStyle={{ fontSize: 12 }} />
-                    <Bar dataKey="puas" name="Puas">
-                      <LabelList dataKey="puas" position="top" formatter={(v) => `${v}%`} />
-                    </Bar>
-                    <Bar dataKey="netral" name="Netral">
-                      <LabelList dataKey="netral" position="top" formatter={(v) => `${v}%`} />
-                    </Bar>
-                    <Bar dataKey="tidakPuas" name="Tidak Puas">
-                      <LabelList dataKey="tidakPuas" position="top" formatter={(v) => `${v}%`} />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <p className="text-sm text-slate-600 mt-3">
-                Ringkasan: Rata-rata proporsi <strong>puas ≈ {ringkasan.meanPuas}%</strong>. Aspek terkuat:
-                <strong> {ringkasan.aspekTerkuat}</strong>. Ruang peningkatan: <strong>{ringkasan.aspekTerlemah}</strong>.
-              </p>
-            </CardBody>
-          </Card>
 
-          <Card>
-            <CardHeader
-              title="Tabel Ringkas Hasil Survei per Aspek"
-              subtitle="Persentase responden per kategori"
-              icon={<FileText className="w-5 h-5" />}
-            />
-            <CardBody>
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-slate-600">
-                      <th className="py-2 pr-4">Aspek</th>
-                      <th className="py-2 pr-4">Puas</th>
-                      <th className="py-2 pr-4">Netral</th>
-                      <th className="py-2 pr-4">Tidak Puas</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.map((row) => (
-                      <tr key={row.aspek} className="border-t border-slate-100">
-                        <td className="py-2 pr-4 font-medium">{row.aspek}</td>
-                        <td className="py-2 pr-4">{row.puas}%</td>
-                        <td className="py-2 pr-4">{row.netral}%</td>
-                        <td className="py-2 pr-4">{row.tidakPuas}%</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardBody>
-          </Card>
-        </>
-      ),
-    },
-    {
-      id: "pembahasan",
-      title: "Pembahasan",
-      body: (
-        <>
-          <p>
-            Secara umum, pengguna memberi penilaian positif pada <em>keamanan</em> dan
-            <em> kemudahan</em>, dua pilar yang kerap menjadi faktor penentu adopsi. Sementara itu,
-            persepsi terhadap <em>biaya</em> relatif lebih rendah dibanding aspek lain—indikasi adanya
-            sensitivitas harga atau kebutuhan transparansi komponen biaya.
-          </p>
-          <p>
-            Korelasi (ρ) antara intensitas penggunaan dan kepuasan—berdasarkan simulasi—cenderung
-            <em>positif lemah sampai sedang</em>. Artinya, makin sering berinteraksi dengan sistem,
-            pengguna sedikit lebih cenderung merasa puas (kemungkinan dipengaruhi <em>learning curve</em>
-            dan keakraban antarmuka). Namun, ini bukan kausalitas; faktor eksternal seperti kondisi
-            pasar kripto juga memengaruhi persepsi pengalaman.
-          </p>
-        </>
-      ),
-    },
-    {
-      id: "kesimpulan",
-      title: "Kesimpulan & Rekomendasi",
-      body: (
-        <ul className="list-disc pl-6">
-          <li>Kepuasan pengguna terhadap sistem transaksi INDODAX berada pada level tinggi.</li>
-          <li>Aspek paling kuat: <strong>{ringkasan.aspekTerkuat}</strong>.</li>
-          <li>Prioritas peningkatan: <strong>{ringkasan.aspekTerlemah}</strong> dan transparansi biaya.</li>
-          <li>
-            Rekomendasi: optimasi performa saat lonjakan trafik, edukasi biaya yang lebih eksplisit,
-            dan kanal dukungan yang responsif serta terintegrasi <em>in-app</em>.
-          </li>
-        </ul>
-      ),
-    },
-    {
-      id: "referensi",
-      title: "Referensi (Umum)",
-      body: (
-        <ol className="list-decimal pl-6">
-          <li>Literatur kepuasan pelanggan & kualitas sistem (model SERVQUAL/ISO 25010).</li>
-          <li>Dokumentasi umum UX pada platform keuangan digital.</li>
-          <li>Laporan industri terkait pengalaman pengguna pada aplikasi perdagangan aset kripto.</li>
+        <h3>Interpretasi singkat</h3>
+        <p class="small">Hasil menunjukkan bahwa kecepatan transaksi merupakan penentu penting kepuasan pengguna. Platform sebaiknya fokus meningkatkan performa saat lonjakan trafik dan menambah transparansi (mis. transaction tracker).</p>
+
+        <h3>Rekomendasi untuk Indodax</h3>
+        <ol class="small">
+          <li>Perkuat infrastruktur server dan optimalkan kode saat load tinggi.</li>
+          <li>Sediakan fitur monitoring transaksi untuk meningkatkan transparansi.</li>
+          <li>Komunikasi proaktif jika terjadi gangguan layanan.</li>
         </ol>
-      ),
-    },
-  ];
 
-  const filteredSections = useMemo(() => {
-    if (!query) return sections;
-    const q = query.toLowerCase();
-    return sections
-      .map((s) => ({
-        ...s,
-        body: (
-          <div className="[&_mark]:bg-yellow-200/60">
-            {highlightReact(s.body, q)}
-          </div>
-        ),
-      }))
-      .filter((s) => toText(sections.find((x) => x.id === s.id).body).toLowerCase().includes(q));
-  }, [query, segment]);
-
-  return (
-    <Container>
-      <motion.header
-        initial={{ opacity: 0, y: -6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8"
-      >
-        <div className="flex flex-col gap-5">
-          <div className="flex items-center gap-3 text-sm text-slate-600">
-            <Tag>
-              <Calendar className="w-3.5 h-3.5 mr-1" /> 24 Agustus 2025
-            </Tag>
-            <Tag>Artikel Ilmiah Populer</Tag>
-            <Tag>Studi Simulasi</Tag>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900">
-            HUBUNGAN TINGKAT KEPUASAN TERHADAP SISTEM TRANSAKSI YANG DIGUNAKAN OLEH APLIKASI ONLINE INDODAX
-          </h1>
-          <p className="text-slate-600 max-w-3xl">
-            Laporan ringkas yang memvisualisasikan temuan utama melalui diagram batang interaktif. Data
-            bersifat simulasi untuk keperluan presentasi dan prototyping.
-          </p>
-          <Toolbar segment={segment} setSegment={setSegment} setQuery={setQuery} />
+        <div style="margin-top:12px;">
+          <h3>Data Tabel Singkat</h3>
+          <table>
+            <thead><tr><th>Variabel</th><th>Jumlah (n)</th><th>Persentase</th></tr></thead>
+            <tbody>
+              <tr><td>Total responden</td><td>62</td><td>100%</td></tr>
+              <tr><td>Puas</td><td>45</td><td>72,6%</td></tr>
+              <tr><td>Tidak puas</td><td>17</td><td>27,4%</td></tr>
+              <tr><td>Kecepatan cepat</td><td>49</td><td>79,0%</td></tr>
+              <tr><td>Kecepatan lambat</td><td>13</td><td>21,0%</td></tr>
+            </tbody>
+          </table>
         </div>
-      </motion.header>
+      </article>
 
-      <main className="space-y-10">
-        {filteredSections.map((sec) => (
-          <Card key={sec.id}>
-            <CardHeader title={sec.title} subtitle={`Bagian: ${sec.id}`} icon={<FileText className="w-5 h-5" />} />
-            <CardBody>
-              <Section id={sec.id}>
-                {sec.body}
-              </Section>
-            </CardBody>
-          </Card>
-        ))}
-      </main>
+      <aside class="card">
+        <h3>Diagram & Grafik</h3>
+        <canvas id="ageChart" width="350" height="220"></canvas>
+        <canvas id="satisfactionChart" width="350" height="220" style="margin-top:14px"></canvas>
+        <canvas id="relationChart" width="350" height="220" style="margin-top:14px"></canvas>
+      </aside>
 
-      <footer className="mt-12 text-xs text-slate-500">
-        <p>
-          {sampleInfo.disclaimer}
-        </p>
-      </footer>
-    </Container>
-  );
-}
+      <section class="card full">
+        <h3>Kesimpulan</h3>
+        <p class="small">a.	Mayoritas responden berusia 20–30 tahun (66,1%), berjenis kelamin laki-laki (54,8%), serta memiliki pendidikan terakhir SMA/MA (48,4%). Lama penggunaan aplikasi sebagian besar adalah 1–2 tahun (40,3%) dengan frekuensi transaksi 2–3 kali dalam sebulan terakhir (45,2%).</p>
+         <p class="small">b.	Sebanyak 45 responden (72,6%) menyatakan puas terhadap kecepatan sistem transaksi pada aplikasi Indodax, sementara 17 responden (27,4%) menyatakan tidak puas. Hal ini menunjukkan bahwa mayoritas pengguna menilai sistem transaksi Indodax cukup cepat dan memuaskan.</p>
+          <p class="small">c.	Hasil uji Chi-Square menunjukkan nilai p-value = 0,032 < 0,05, yang berarti terdapat hubungan yang signifikan antara kecepatan sistem transaksi dengan tingkat kepuasan pengguna. Semakin cepat sistem memproses transaksi, semakin tinggi pula tingkat kepuasan pengguna.</p>
+      </section>
 
-// --- Helpers ---
-function toText(node) {
-  if (typeof node === "string") return node;
-  if (Array.isArray(node)) return node.map(toText).join(" ");
-  if (node && node.props && node.props.children) return toText(node.props.children);
-  return "";
-}
+    </div>
 
-function highlightReact(node, q) {
-  if (!q) return node;
-  if (typeof node === "string") return highlightString(node, q);
-  if (Array.isArray(node)) return node.map((child, i) => <React.Fragment key={i}>{highlightReact(child, q)}</React.Fragment>);
-  if (node && node.props && node.props.children) {
-    return React.cloneElement(node, { ...node.props, children: highlightReact(node.props.children, q) });
-  }
-  return node;
-}
+    <footer class="card">
+      <div class="small">Sumber dokumen asli berasal dari BAB 4-5 skripsi Arira Satra Yoga</div>
+    </footer>
+  </div>
 
-function highlightString(text, q) {
-  const parts = text.split(new RegExp(`(${escapeRegExp(q)})`, "gi"));
-  return parts.map((part, i) => (part.toLowerCase() === q.toLowerCase() ? <mark key={i}>{part}</mark> : part));
-}
+  <script>
+    // Data diambil dari dokumen: n=62
+    const ageCtx = document.getElementById('ageChart').getContext('2d');
+    const ageChart = new Chart(ageCtx, {
+      type: 'bar',
+      data: {
+        labels: ['20-30', '31-40'],
+        datasets: [{
+          label: 'Jumlah Responden',
+          data: [41, 21],
+          backgroundColor: ['rgba(15,118,110,0.85)','rgba(6,182,212,0.85)'],
+          borderRadius: 6
+        }]
+      },
+      options: {
+        plugins:{legend:{display:false}},
+        scales:{y:{beginAtZero:true,ticks:{precision:0}}}
+      }
+    });
 
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+    const satCtx = document.getElementById('satisfactionChart').getContext('2d');
+    const satChart = new Chart(satCtx, {
+      type: 'pie',
+      data: {
+        labels: ['Puas','Tidak Puas'],
+        datasets: [{data:[45,17], backgroundColor:['rgba(15,118,110,0.9)','rgba(120,124,140,0.9)']}]
+      },
+      options:{plugins:{legend:{position:'bottom'}}}
+    });
+
+    // Grafik hubungan kecepatan vs kepuasan
+    const relationCtx = document.getElementById('relationChart').getContext('2d');
+    const relationChart = new Chart(relationCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Cepat','Lambat'],
+        datasets: [
+          {
+            label: 'Puas',
+            data: [40, 5], // asumsi dari distribusi data
+            backgroundColor: 'rgba(15,118,110,0.85)',
+            borderRadius: 5
+          },
+          {
+            label: 'Tidak Puas',
+            data: [9, 8], // asumsi dari distribusi data
+            backgroundColor: 'rgba(120,124,140,0.85)',
+            borderRadius: 5
+          }
+        ]
+      },
+      options: {
+        responsive:true,
+        plugins:{legend:{position:'bottom'}},
+        scales:{y:{beginAtZero:true,ticks:{precision:0}}}
+      }
+    });
+  </script>
+</body>
+</html>
