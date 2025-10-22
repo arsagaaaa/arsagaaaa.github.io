@@ -1,1 +1,411 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard Analisis — HTML + CSS</title>
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --muted:#6b7280; --accent:#4f46e5;
+    --accent-2:#06b6d4; --danger:#ef4444; --glass: rgba(15,23,42,0.04);
+    --radius:12px; --max-width:1200px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:#0f172a;line-height:1.35}
+  .container{max-width:var(--max-width);margin:28px auto;padding:18px;display:flex;gap:18px}
+  aside{width:250px;background:var(--card);border-radius:var(--radius);box-shadow:0 6px 18px rgba(2,6,23,0.06);padding:18px;flex-shrink:0;position:sticky;top:18px;height:calc(100vh - 36px);overflow:auto}
+  aside h1{margin:0;font-size:18px}
+  nav{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+  nav a{padding:8px;border-radius:8px;text-decoration:none;color:#0f172a;font-size:14px}
+  nav a:hover{background:var(--glass)}
+  main{flex:1}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .title{margin:0}
+  .title h2{font-size:20px;margin:0}
+  .title p{margin:2px 0 0;color:var(--muted);font-size:13px}
+  .controls{display:flex;gap:8px;align-items:center}
+  input[type="search"]{padding:8px 10px;border-radius:8px;border:1px solid #e6eef6;min-width:220px}
+  button{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(79,70,229,0.12)}
+  /* cards */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 14px rgba(2,6,23,0.04)}
+  .card .label{font-size:13px;color:var(--muted)}
+  .card .value{font-size:20px;font-weight:700;margin-top:6px}
+  /* charts area */
+  .charts{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:16px}
+  .chart, .chart-small{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 14px rgba(2,6,23,0.04)}
+  .chart h3, .chart-small h3{margin:0 0 8px 0;font-size:15px}
+  /* lower row */
+  .lower{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .table-wrap{background:var(--card);padding:12px;border-radius:10px;box-shadow:0 6px 14px rgba(2,6,23,0.04);overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th, td{padding:8px;text-align:left;border-bottom:1px solid #f1f5f9}
+  tr:hover td{background:#fbfdff}
+  .pager{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-top:10px;font-size:13px}
+  .small{font-size:12px;color:var(--muted)}
+  footer{margin-top:14px;color:var(--muted);font-size:13px}
+
+  /* responsive */
+  @media (max-width:1000px){
+    .container{padding:12px}
+    aside{display:none}
+    .cards{grid-template-columns:repeat(2,1fr)}
+    .charts{grid-template-columns:1fr}
+    .lower{grid-template-columns:1fr}
+  }
+  @media (max-width:600px){
+    .cards{grid-template-columns:1fr}
+    input[type="search"]{min-width:140px}
+  }
+
+  /* small helpers for svg */
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .legend .item{display:flex;gap:6px;align-items:center;font-size:13px}
+  .swatch{width:12px;height:12px;border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <aside>
+    <h1>Analitik • Dashboard</h1>
+    <nav>
+      <a href="#">Overview</a>
+      <a href="#">Transaksi</a>
+      <a href="#">Pengguna</a>
+      <a href="#">Laporan</a>
+      <a href="#">Pengaturan</a>
+    </nav>
+    <hr style="margin:12px 0;border:none;border-top:1px solid #f1f5f9">
+    <div style="font-size:13px;color:var(--muted)">Petunjuk cepat</div>
+    <ul style="padding-left:18px;margin:8px 0 0 0;color:var(--muted);font-size:13px">
+      <li>Gunakan kotak pencarian untuk filter tabel.</li>
+      <li>Klik Export CSV untuk unduh tampilan tabel saat ini.</li>
+      <li>Layout responsif — sembunyikan sidebar di layar kecil.</li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="title">
+        <h2>Dashboard Analisis Statistik</h2>
+        <p>Ringkasan performa aplikasi dan survei pengguna</p>
+      </div>
+
+      <div class="controls">
+        <input id="search" type="search" placeholder="Cari (kecepatan, kepuasan, pendidikan...)" />
+        <button id="exportBtn">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="cards" id="cards">
+      <!-- cards diisi lewat JS -->
+    </div>
+
+    <div class="charts">
+      <div class="chart">
+        <h3>Transaksi & Users (12 bulan)</h3>
+        <svg id="lineChart" width="100%" height="260" viewBox="0 0 800 260" preserveAspectRatio="xMinYMin meet"></svg>
+      </div>
+
+      <div class="chart-small">
+        <h3>Distribusi Kecepatan</h3>
+        <svg id="pieChart" width="100%" height="160" viewBox="0 0 300 160" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="legend" id="pieLegend"></div>
+      </div>
+    </div>
+
+    <div class="lower">
+      <div class="chart">
+        <h3>Transaksi per Bulan (Bar Sample)</h3>
+        <svg id="barChart" width="100%" height="220" viewBox="0 0 700 220" preserveAspectRatio="xMinYMin meet"></svg>
+      </div>
+
+      <div class="table-wrap">
+        <h3 style="margin-top:0">Tabel Responden (Preview)</h3>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <div class="small" id="tableInfo">Menampilkan 0 baris</div>
+        </div>
+
+        <div style="overflow:auto">
+          <table id="dataTable">
+            <thead>
+              <tr><th>ID</th><th>Usia</th><th>Jenis Kelamin</th><th>Kecepatan</th><th>Kepuasan</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <div class="small" id="rowsCount"></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="prevBtn" class="ghost">Prev</button>
+            <div id="pageIndicator" style="border:1px solid #eee;padding:6px 10px;border-radius:8px;background:#fff">1 / 1</div>
+            <button id="nextBtn" class="ghost">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>Generated sample dashboard • Ubah data & style sesuai kebutuhan.</footer>
+  </main>
+</div>
+
+<script>
+/* Data generasi (mirip file React) */
+function makeMonths(n){
+  const res = [];
+  const now = new Date();
+  for(let i = n-1; i>=0; i--){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const label = d.toLocaleString('default',{month:'short', year:'numeric'});
+    res.push(label);
+  }
+  return res;
+}
+
+const months = makeMonths(12);
+const sampleTimeseries = months.map(m => ({
+  month: m,
+  transaksi: Math.round(80 + Math.random()*120),
+  users: Math.round(50 + Math.random()*90),
+  latency: Math.round(100 + Math.random()*300)
+}));
+
+const sampleCategory = [
+  {name:'Cepat', value: Math.round(Math.random()*70) + 30},
+  {name:'Lambat', value: 100} // we'll normalize in render
+];
+
+/* sample table 62 rows */
+const sampleTable = Array.from({length:62}).map((_,i)=>({
+  id: i+1,
+  usia: ["20-30","31-40"][Math.floor(Math.random()*2)],
+  jenis_kelamin: Math.random() > 0.45 ? "Laki-laki" : "Perempuan",
+  pendidikan: ["SMA/MA","Perguruan Tinggi","SMP/MTS","SD/MI"][Math.floor(Math.random()*4)],
+  lama_penggunaan: ["<1 Tahun","1-2 Tahun",">2 Tahun"][Math.floor(Math.random()*3)],
+  transaksi_bulan: ["1 kali","2-3 kali","4-5 kali",">5 kali"][Math.floor(Math.random()*4)],
+  kecepatan: Math.random() > 0.21 ? "Cepat" : "Lambat",
+  kepuasan: Math.random() > 0.27 ? "Puas" : "Tidak Puas"
+}));
+
+/* --- Cards --- */
+function renderCards(){
+  const totals = {
+    totalUsers: sampleTable.length,
+    transaksi: sampleTimeseries.reduce((s,r)=>s+r.transaksi,0),
+    avgLatency: Math.round(sampleTimeseries.reduce((s,r)=>s+r.latency,0)/sampleTimeseries.length),
+    puas: sampleTable.filter(r=>r.kepuasan==='Puas').length
+  };
+  const cardsEl = document.getElementById('cards');
+  cardsEl.innerHTML = '';
+  const items = [
+    {label:'Total Responden', value: totals.totalUsers},
+    {label:'Total Transaksi (12 bln)', value: totals.transaksi},
+    {label:'Rata-rata Latency (ms)', value: totals.avgLatency + ' ms'},
+    {label:'Kepuasan (Puas)', value: `${totals.puas} (${((totals.puas/totals.totalUsers)*100).toFixed(1)}%)`}
+  ];
+  items.forEach(it=>{
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `<div class="label">${it.label}</div><div class="value">${it.value}</div>`;
+    cardsEl.appendChild(div);
+  });
+}
+
+/* --- Simple SVG Line Chart --- */
+function renderLineChart(){
+  const svg = document.getElementById('lineChart');
+  const w = 780, h = 240, pad = 40;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.innerHTML = '';
+  const maxY = Math.max(...sampleTimeseries.map(s=>Math.max(s.transaksi, s.users))) * 1.15;
+  const xStep = (w - pad*2) / (sampleTimeseries.length - 1);
+  // grid lines and labels
+  for(let i=0;i<=4;i++){
+    const y = pad + (h - pad*2) * (i/4);
+    const val = Math.round(maxY * (1 - i/4));
+    svg.innerHTML += `<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="#eef2ff" />`;
+    svg.innerHTML += `<text x="${pad-6}" y="${y+4}" font-size="11" text-anchor="end" fill="#94a3b8">${val}</text>`;
+  }
+  // x labels
+  sampleTimeseries.forEach((d,i)=>{
+    const x = pad + xStep * i;
+    svg.innerHTML += `<text x="${x}" y="${h-pad+18}" font-size="11" text-anchor="middle" fill="#64748b">${d.month.replace(' ','\\n')}</text>`;
+  });
+  // line path helper
+  function pathFor(key){
+    return sampleTimeseries.map((d,i)=>{
+      const x = pad + xStep*i;
+      const y = pad + (h - pad*2) * (1 - d[key]/maxY);
+      return `${i===0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    }).join(' ');
+  }
+  // area under lines (subtle)
+  const p1 = pathFor('transaksi');
+  const p2 = pathFor('users');
+  svg.innerHTML += `<path d="${p1} L ${w-pad} ${h-pad} L ${pad} ${h-pad} Z" fill="rgba(79,70,229,0.06)" stroke="none"></path>`;
+  svg.innerHTML += `<path d="${p2} L ${w-pad} ${h-pad} L ${pad} ${h-pad} Z" fill="rgba(6,182,212,0.04)" stroke="none"></path>`;
+  // strokes
+  svg.innerHTML += `<path d="${p1}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#4f46e5'}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+  svg.innerHTML += `<path d="${p2}" fill="none" stroke="#06b6d4" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+  // points
+  sampleTimeseries.forEach((d,i)=>{
+    const x = pad + xStep*i;
+    const y1 = pad + (h - pad*2) * (1 - d.transaksi/maxY);
+    const y2 = pad + (h - pad*2) * (1 - d.users/maxY);
+    svg.innerHTML += `<circle cx="${x}" cy="${y1}" r="3.2" fill="#4f46e5"></circle>`;
+    svg.innerHTML += `<circle cx="${x}" cy="${y2}" r="3.2" fill="#06b6d4"></circle>`;
+  });
+  // legend
+  svg.innerHTML += `<rect x="${w-180}" y="10" width="160" height="28" rx="6" fill="transparent"></rect>`;
+  svg.innerHTML += `<g transform="translate(${w-170},16)"><rect width="10" height="10" fill="#4f46e5"></rect><text x="16" y="9" font-size="12" fill="#334155">Transaksi</text></g>`;
+  svg.innerHTML += `<g transform="translate(${w-90},16)"><rect width="10" height="10" fill="#06b6d4"></rect><text x="16" y="9" font-size="12" fill="#334155">Users</text></g>`;
+}
+
+/* --- Pie chart --- */
+function renderPie(){
+  const svg = document.getElementById('pieChart');
+  svg.innerHTML = '';
+  const w = 300, h = 160, cx = 90, cy = 80, r = 60;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  // normalize
+  const total = sampleTable.reduce((s,r)=>(r.kecepatan==='Cepat'?1:0)+s,0) + sampleTable.filter(r=>r.kecepatan==='Lambat').length;
+  const fast = sampleTable.filter(r=>r.kecepatan==='Cepat').length;
+  const slow = sampleTable.length - fast;
+  const data = [{name:'Cepat', value: fast},{name:'Lambat', value: slow}];
+  const colors = ['#4f46e5','#06b6d4','#f59e0b','#ef4444'];
+  let start = 0;
+  data.forEach((d,i)=>{
+    const portion = d.value/(fast+slow);
+    const end = start + portion;
+    const startAngle = start * Math.PI * 2 - Math.PI/2;
+    const endAngle = end * Math.PI * 2 - Math.PI/2;
+    const x1 = cx + r * Math.cos(startAngle);
+    const y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle);
+    const y2 = cy + r * Math.sin(endAngle);
+    const large = portion > 0.5 ? 1 : 0;
+    const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+    svg.innerHTML += `<path d="${path}" fill="${colors[i%colors.length]}"></path>`;
+    start = end;
+  });
+  // legend
+  const legend = document.getElementById('pieLegend');
+  legend.innerHTML = '';
+  data.forEach((d,i)=>{
+    const sw = document.createElement('div');
+    sw.className = 'item';
+    sw.innerHTML = `<div class="swatch" style="background:${colors[i%colors.length]}"></div><div>${d.name} — ${d.value} (${((d.value/(fast+slow))*100).toFixed(1)}%)</div>`;
+    legend.appendChild(sw);
+  });
+}
+
+/* --- Bar chart --- */
+function renderBar(){
+  const svg = document.getElementById('barChart');
+  const w = 680, h = 200, pad = 30;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.innerHTML = '';
+  const maxVal = Math.max(...sampleTimeseries.map(s=>s.transaksi)) * 1.15;
+  const barW = (w - pad*2) / sampleTimeseries.length;
+  sampleTimeseries.forEach((d,i)=>{
+    const x = pad + barW * i + barW*0.12;
+    const barH = (d.transaksi / maxVal) * (h - pad*2);
+    const y = h - pad - barH;
+    svg.innerHTML += `<rect x="${x}" y="${y}" width="${barW*0.76}" height="${barH}" rx="4" fill="#4f46e5"></rect>`;
+    svg.innerHTML += `<text x="${x + barW*0.38}" y="${h - pad + 14}" font-size="10" text-anchor="middle" fill="#64748b">${d.month.split(' ')[0]}</text>`;
+  });
+}
+
+/* --- Table, search, pagination, export CSV --- */
+let state = {query:'', page:1, perPage:10};
+const tbody = document.querySelector('#dataTable tbody');
+const rowsCountEl = document.getElementById('rowsCount');
+const pageIndicator = document.getElementById('pageIndicator');
+const tableInfo = document.getElementById('tableInfo');
+
+function getFiltered(){
+  const q = state.query.trim().toLowerCase();
+  if(!q) return sampleTable.slice();
+  return sampleTable.filter(r=>{
+    return String(r.id).includes(q) ||
+           r.kecepatan.toLowerCase().includes(q) ||
+           r.kepuasan.toLowerCase().includes(q) ||
+           r.jenis_kelamin.toLowerCase().includes(q) ||
+           (r.pendidikan && r.pendidikan.toLowerCase().includes(q));
+  });
+}
+
+function renderTable(){
+  const filtered = getFiltered();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / state.perPage));
+  if(state.page > totalPages) state.page = totalPages;
+  const start = (state.page-1)*state.perPage;
+  const pageData = filtered.slice(start, start + state.perPage);
+
+  tbody.innerHTML = pageData.map(r=>`<tr>
+    <td>${r.id}</td>
+    <td>${r.usia}</td>
+    <td>${r.jenis_kelamin}</td>
+    <td>${r.kecepatan}</td>
+    <td>${r.kepuasan}</td>
+  </tr>`).join('');
+
+  rowsCountEl.textContent = `Menampilkan ${pageData.length} dari ${filtered.length} baris`;
+  pageIndicator.textContent = `${state.page} / ${totalPages}`;
+  tableInfo.textContent = `Menampilkan ${pageData.length} dari ${filtered.length} baris (halaman ${state.page})`;
+}
+
+/* export CSV dari data pada halaman sekarang */
+function exportCSV(){
+  const filtered = getFiltered();
+  const start = (state.page-1)*state.perPage;
+  const pageData = filtered.slice(start, start + state.perPage);
+  if(pageData.length === 0){ alert('Tidak ada baris untuk diekspor'); return; }
+  const header = Object.keys(pageData[0]).join(',');
+  const rows = pageData.map(r => Object.values(r).map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\\n');
+  const csv = header + '\\n' + rows;
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `dashboard-data-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* events */
+document.getElementById('search').addEventListener('input', (e)=>{
+  state.query = e.target.value;
+  state.page = 1;
+  renderTable();
+  renderPie(); // update pie if filter affects kecepatan
+});
+document.getElementById('prevBtn').addEventListener('click', ()=>{
+  state.page = Math.max(1, state.page - 1);
+  renderTable();
+});
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  const totalPages = Math.max(1, Math.ceil(getFiltered().length / state.perPage));
+  state.page = Math.min(totalPages, state.page + 1);
+  renderTable();
+});
+document.getElementById('exportBtn').addEventListener('click', exportCSV);
+
+/* initial render */
+renderCards();
+renderLineChart();
+renderPie();
+renderBar();
+renderTable();
+
+</script>
+
+</body>
+</html>
 
